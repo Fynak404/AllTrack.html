@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AllStack — Growth & Data Intelligence</title>
+    <script src="https://cdn.jsdelivr.net/npm/@whop-apps/sdk@latest/dist/index.umd.min.js"></script>
+    <style>
+        :root {
+            --bg-base: #0F0C16;
+            --bg-surface: #161224;
+            --bg-elevated: #1D1830;
+            --border: rgba(255, 255, 255, 0.08);
+            --text-primary: #FFFFFF;
+            --text-secondary: #94A3B8;
+            --accent: #A855F7;
+            --accent-hover: #9333EA;
+            --success: #22C55E;
+            --error: #EF4444;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-base);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── Header ── */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 32px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-surface);
+        }
+        .brand {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .brand span { color: var(--accent); }
+        .tier-badge {
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            background: rgba(168, 85, 247, 0.1);
+        }
+        .tier-badge.ultra { border-color: #3B82F6; color: #3B82F6; background: rgba(59, 130, 246, 0.1); }
+        .tier-badge.mega { border-color: #F59E0B; color: #F59E0B; background: rgba(245, 158, 11, 0.1); }
+
+        /* ── Main Layout ── */
+        .main {
+            flex: 1;
+            padding: 32px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        /* ── Platform Grid ── */
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 48px;
+        }
+
+        .platform-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .platform-card:hover {
+            border-color: var(--accent);
+            background: var(--bg-elevated);
+            transform: translateY(-2px);
+        }
+        .platform-card.active {
+            border-color: var(--accent);
+            background: var(--bg-elevated);
+            box-shadow: 0 0 0 1px var(--accent);
+        }
+        .platform-card .name {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .platform-card .desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* ── Config Panel ── */
+        .config-panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            margin-bottom: 32px;
+        }
+        .config-panel h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-base);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-color: var(--accent);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .form-group .hint {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        .mode-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .mode-toggle button {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .mode-toggle button.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .action-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+        .btn-secondary:hover { background: var(--bg-elevated); }
+
+        /* ── Results ── */
+        .results-section {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px;
+        }
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .results-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+        }
+        .status-dot.ok { background: var(--success); }
+        .status-dot.error { background: var(--error); }
+        .status-dot.loading { background: var(--accent); animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th {
+            text-align: left;
+            padding: 12px 16px;
+            background: var(--bg-base);
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 11px;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* ── Loading Overlay ── */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 12, 22, 0.8);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 16px;
+            z-index: 100;
+        }
+        .loading-overlay.active { display: flex; }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-overlay p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 200;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s;
+            max-width: 400px;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.success { background: var(--success); color: white; }
+        .toast.error { background: var(--error); color: white; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="brand">All<span>Stack</span></div>
+        <div id="tierBadge" class="tier-badge">Loading...</div>
+    </header>
+
+    <!-- Main -->
+    <main class="main">
+
+        <!-- Platform Selection -->
+        <div class="section-title">Select Platform</div>
+        <div class="platform-grid" id="platformGrid"></div>
+
+        <!-- Config Panel -->
+        <div class="config-panel" id="configPanel" style="display:none;">
+            <h2 id="configTitle">Configure Scrape</h2>
+
+            <div class="mode-toggle" id="modeToggle"></div>
+
+            <div id="formFields"></div>
+
+            <div class="action-row">
+                <button class="btn btn-primary" id="runBtn">Run Scrape</button>
+                <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="results-section" id="resultsSection">
+            <div class="results-header">
+                <h2>Results</h2>
+                <div class="status-indicator">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span id="statusText">Idle</span>
+                </div>
+            </div>
+            <div class="table-container" id="tableContainer">
+                <div class="empty-state">Select a platform and run a scrape to see results.</div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p id="loadingText">Extracting data...</p>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+<script>
+    // ──────────────────────────────────────────────────────────────────
+    // CONFIG — Replace these with your actual Whop Product IDs
+    // ──────────────────────────────────────────────────────────────────
+    const WHOP_PRODUCT_IDS = {
+        PRO:   'prod_XXXXXXXXXXXXX', // <-- YOUR PRO PRODUCT ID
+        ULTRA: 'prod_YYYYYYYYYYYYY', // <-- YOUR ULTRA PRODUCT ID
+        MEGA:  'prod_ZZZZZZZZZZZZZ', // <-- YOUR MEGA PRODUCT ID
+    };
+
+    // Your deployed AllStack Worker base URL
+    const BACKEND_URL = 'https://allstack.YOUR_SUBDOMAIN.workers.dev';
+
+    // ──────────────────────────────────────────────────────────────────
+    // STATE
+    // ──────────────────────────────────────────────────────────────────
+    let state = {
+        tier: null,
+        userId: null,
+        selectedPlatform: null,
+        selectedMode: null,
+        currentConfig: {},
+        currentPollInterval: null,
+    };
+
+    // ──────────────────────────────────────────────────────────────────
+    // DOM REFS
+    // ──────────────────────────────────────────────────────────────────
+    const $ = (id) => document.getElementById(id);
+    const platformGrid = $('platformGrid');
+    const configPanel = $('configPanel');
+    const configTitle = $('configTitle');
+    const modeToggle = $('modeToggle');
+    const formFields = $('formFields');
+    const runBtn = $('runBtn');
+    const cancelBtn = $('cancelBtn');
+    const resultsSection = $('resultsSection');
+    const tableContainer = $('tableContainer');
+    const statusDot = $('statusDot');
+    const statusText = $('statusText');
+    const loadingOverlay = $('loadingOverlay');
+    const loadingText = $('loadingText');
+    const tierBadge = $('tierBadge');
+    const toast = $('toast');
+
+    // ──────────────────────────────────────────────────────────────────
+    // PLATFORM DEFINITIONS (matches backend SCRAPERS registry)
+    // ──────────────────────────────────────────────────────────────────
+    const PLATFORMS = {
+        tiktok: {
+            name: 'TikTok',
+            desc: 'Viral trends, hashtags & profiles',
+            modes: {
+                viral:    { label: 'Viral Trends', fields: [{ key: 'keywords', label: 'Keywords (comma-separated)', placeholder: 'skincare, fitness' }] },
+                hashtags: { label: 'Hashtag Scrape', fields: [{ key: 'hashtags', label: 'Hashtags (comma-separated)', placeholder: 'fitness, gymtok' }] },
+                profiles: { label: 'Profile Scrape', fields: [{ key: 'profiles', label: 'Usernames (comma-separated)', placeholder: 'charlidamelio, addisonre' }] },
+                search:   { label: 'Search', fields: [{ key: 'keywords', label: 'Search terms', placeholder: 'skincare' }] },
+            }
+        },
+        instagram: {
+            name: 'Instagram',
+            desc: 'Reels, hashtags & profiles',
+            modes: {
+                viral:    { label: 'Viral Trends', fields: [{ key: 'hashtags', label: 'Hashtags (comma-separated)', placeholder: 'cleanbeauty, gym' }] },
+                hashtags: { label: 'Hashtag Scrape', fields: [{ key: 'hashtags', label: 'Hashtags', placeholder: 'cleanbeauty' }] },
+                profiles: { label: 'Profile Scrape', fields: [{ key: 'profiles', label: 'Usernames', placeholder: 'natgeo, nike' }] },
+                search:   { label: 'Hashtag Search', fields: [{ key: 'keyword', label: 'Keyword', placeholder: 'travel' }] },
+            }
+        },
+        twitter: {
+            name: 'Twitter / X',
+            desc: 'Tweets, threads & profiles',
+            modes: {
+                viral:    { label: 'Viral Tweets', fields: [{ key: 'keywords', label: 'Search terms', placeholder: 'AI agents min_faves:100' }] },
+                search:   { label: 'Latest Tweets', fields: [{ key: 'keywords', label: 'Search terms', placeholder: 'AI agents' }] },
+                profiles: { label: 'Profile Scrape', fields: [{ key: 'handles', label: 'Handles', placeholder: 'elonmusk, nasa' }] },
+            }
+        },
+        youtube: {
+            name: 'YouTube',
+            desc: 'Video search & viral outliers',
+            modes: {
+                viral:  { label: 'Viral Videos', fields: [{ key: 'keywords', label: 'Search terms', placeholder: 'faceless channel' }] },
+                search: { label: 'Video Search', fields: [{ key: 'keywords', label: 'Search terms', placeholder: 'Crawlee' }] },
+            }
+        },
+        googlemaps: {
+            name: 'Google Maps',
+            desc: 'Business leads & local data',
+            modes: {
+                leads:  { label: 'Lead Finder', fields: [{ key: 'queries', label: 'Search queries', placeholder: 'roofers in Austin' }] },
+                search: { label: 'Business Search', fields: [{ key: 'queries', label: 'Search queries', placeholder: 'coffee shops in NYC' }] },
+            }
+        },
+        facebook: {
+            name: 'Facebook',
+            desc: 'Page posts & keyword search',
+            modes: {
+                pages:  { label: 'Page Posts', fields: [{ key: 'urls', label: 'Page URLs (comma-separated)', placeholder: 'https://www.facebook.com/nike' }] },
+                search: { label: 'Keyword Search', fields: [{ key: 'keywords', label: 'Keywords', placeholder: 'artemis mission' }] },
+            }
+        },
+        linkedin: {
+            name: 'LinkedIn',
+            desc: 'Job postings & hiring signals',
+            modes: {
+                jobs: { label: 'Job Search', fields: [{ key: 'search_urls', label: 'LinkedIn Jobs Search URLs', placeholder: 'https://www.linkedin.com/jobs/search/?keywords=clay' }] },
+            }
+        },
+    };
+
+    // ──────────────────────────────────────────────────────────────────
+    // WHOP AUTHENTICATION & TIER DETECTION
+    // ──────────────────────────────────────────────────────────────────
+    async function initWhop() {
+        try {
+            // The Whop SDK attaches x-whop-user-token to same-origin requests.
+            // We call our own backend endpoint to verify and get the user's tier.
+            const res = await fetch(`${BACKEND_URL}/api/whop/me`, {
+                headers: {
+                    // The SDK automatically injects x-whop-user-token
+                }
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                state.tier = data.tier; // "PRO", "ULTRA", or "MEGA"
+                state.userId = data.userId;
+                updateTierBadge(state.tier);
+                showToast(`Authenticated as ${state.tier} tier`, 'success');
+                return true;
+            } else {
+                // Fallback: Detect via Whop hasAccess if backend endpoint isn't ready
+                return await detectTierClientSide();
+            }
+        } catch (e) {
+            console.warn('Whop backend auth failed, trying client-side detection:', e);
+            return await detectTierClientSide();
+        }
+    }
+
+    async function detectTierClientSide() {
+        try {
+            // Check each product ID using the Whop SDK's hasAccess function
+            const proAccess   = await WhopSDK.hasAccess({ to: WHOP_PRODUCT_IDS.PRO });
+            const ultraAccess = await WhopSDK.hasAccess({ to: WHOP_PRODUCT_IDS.ULTRA });
+            const megaAccess  = await WhopSDK.hasAccess({ to: WHOP_PRODUCT_IDS.MEGA });
+
+            if (megaAccess)       { state.tier = 'MEGA'; }
+            else if (ultraAccess) { state.tier = 'ULTRA'; }
+            else if (proAccess)   { state.tier = 'PRO'; }
+            else {
+                showToast('No active AllStack subscription found.', 'error');
+                state.tier = 'PRO'; // Default fallback
+            }
+
+            state.userId = 'whop_user_' + Math.random().toString(36).slice(2, 10);
+            updateTierBadge(state.tier);
+            return true;
+        } catch (e) {
+            console.error('Client-side tier detection failed:', e);
+            showToast('Could not verify Whop subscription. Defaulting to PRO.', 'error');
+            state.tier = 'PRO';
+            state.userId = 'anonymous';
+            updateTierBadge('PRO');
+            return false;
+        }
+    }
+
+    function updateTierBadge(tier) {
+        tierBadge.textContent = tier;
+        tierBadge.className = 'tier-badge ' + tier.toLowerCase();
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // UI RENDERING
+    // ──────────────────────────────────────────────────────────────────
+    function renderPlatforms() {
+        platformGrid.innerHTML = '';
+        for (const [key, p] of Object.entries(PLATFORMS)) {
+            const card = document.createElement('div');
+            card.className = 'platform-card';
+            card.dataset.platform = key;
+            card.innerHTML = `
+                <div class="name">${p.name}</div>
+                <div class="desc">${p.desc}</div>
+            `;
+            card.addEventListener('click', () => selectPlatform(key));
+            platformGrid.appendChild(card);
+        }
+    }
+
+    function selectPlatform(platformKey) {
+        state.selectedPlatform = platformKey;
+        state.selectedMode = null;
+        state.currentConfig = {};
+
+        // Highlight active card
+        document.querySelectorAll('.platform-card').forEach(c => c.classList.remove('active'));
+        document.querySelector(`.platform-card[data-platform="${platformKey}"]`).classList.add('active');
+
+        const platform = PLATFORMS[platformKey];
+        configTitle.textContent = `Configure ${platform.name} Scrape`;
+
+        // Render mode toggle
+        modeToggle.innerHTML = '';
+        for (const [modeKey, mode] of Object.entries(platform.modes)) {
+            const btn = document.createElement('button');
+            btn.textContent = mode.label;
+            btn.dataset.mode = modeKey;
+            btn.addEventListener('click', () => selectMode(modeKey));
+            modeToggle.appendChild(btn);
+        }
+
+        // Auto-select first mode
+        const firstMode = Object.keys(platform.modes)[0];
+        selectMode(firstMode);
+
+        configPanel.style.display = 'block';
+    }
+
+    function selectMode(modeKey) {
+        state.selectedMode = modeKey;
+        state.currentConfig = {};
+
+        // Highlight active mode button
+        modeToggle.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        modeToggle.querySelector(`button[data-mode="${modeKey}"]`).classList.add('active');
+
+        // Render form fields
+        const platform = PLATFORMS[state.selectedPlatform];
+        const mode = platform.modes[modeKey];
+        formFields.innerHTML = '';
+
+        for (const field of mode.fields) {
+            const group = document.createElement('div');
+            group.className = 'form-group';
+            group.innerHTML = `
+                <label>${field.label}</label>
+                <input type="text" data-key="${field.key}" placeholder="${field.placeholder || ''}" />
+            `;
+            formFields.appendChild(group);
+        }
+
+        // Attach input listeners
+        formFields.querySelectorAll('input').forEach(inp => {
+            inp.addEventListener('input', (e) => {
+                const key = e.target.dataset.key;
+                const val = e.target.value.split(',').map(s => s.trim()).filter(Boolean);
+                state.currentConfig[key] = val;
+            });
+        });
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // SCRAPE EXECUTION
+    // ──────────────────────────────────────────────────────────────────
+    async function runScrape() {
+        if (!state.selectedPlatform || !state.selectedMode) {
+            showToast('Select a platform and mode first.', 'error');
+            return;
+        }
+
+        // Validate required fields
+        const platform = PLATFORMS[state.selectedPlatform];
+        const mode = platform.modes[state.selectedMode];
+        for (const field of mode.fields) {
+            if (!state.currentConfig[field.key] || state.currentConfig[field.key].length === 0) {
+                showToast(`Please fill in "${field.label}".`, 'error');
+                return;
+            }
+        }
+
+        // Lock UI
+        runBtn.disabled = true;
+        loadingOverlay.classList.add('active');
+        loadingText.textContent = `Extracting ${platform.name} data...`;
+        setStatus('loading', 'Extracting...');
+        tableContainer.innerHTML = '<div class="empty-state">Waiting for results...</div>';
+
+        try {
+            // Always use async for reliability
+            const payload = {
+                platform: state.selectedPlatform,
+                mode: state.selectedMode,
+                params: state.currentConfig,
+                tier: state.tier,
+                user_id: state.userId,
+                requested_results: 50, // Will be capped by tier
+            };
+
+            const res = await fetch(`${BACKEND_URL}/api/run-async`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-user-id': state.userId,
+                },
+                body: JSON.stringify(payload),
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Backend error');
+            }
+
+            const data = await res.json();
+            showToast(`Run started: ${data.run_id}`, 'success');
+            loadingText.textContent = 'Scraping in progress...';
+
+            // Poll for results
+            await pollRunStatus(data.run_id, data.results_url);
+
+        } catch (e) {
+            console.error('Scrape error:', e);
+            showToast(e.message, 'error');
+            setStatus('error', 'Failed');
+            tableContainer.innerHTML = `<div class="empty-state">Error: ${e.message}</div>`;
+        } finally {
+            runBtn.disabled = false;
+            loadingOverlay.classList.remove('active');
+        }
+    }
+
+    async function pollRunStatus(runId, resultsUrl) {
+        const maxAttempts = 60; // 60 * 3s = 3 minutes max
+        let attempts = 0;
+
+        return new Promise((resolve, reject) => {
+            const interval = setInterval(async () => {
+                attempts++;
+                if (attempts > maxAttempts) {
+                    clearInterval(interval);
+                    reject(new Error('Scrape timed out'));
+                    return;
+                }
+
+                try {
+                    const res = await fetch(`${BACKEND_URL}/api/run-async/${runId}/status`);
+                    const data = await res.json();
+
+                    if (data.finished) {
+                        clearInterval(interval);
+                        if (data.status === 'SUCCEEDED') {
+                            loadingText.textContent = 'Fetching results...';
+                            await fetchResults(resultsUrl);
+                            resolve();
+                        } else {
+                            reject(new Error(`Run ended with status: ${data.status}`));
+                        }
+                    } else {
+                        loadingText.textContent = `Scraping... (${data.status})`;
+                    }
+                } catch (e) {
+                    // Status check failed; keep trying
+                    console.warn('Status poll error:', e);
+                }
+            }, 3000);
+        });
+    }
+
+    async function fetchResults(resultsUrl) {
+        const res = await fetch(`${BACKEND_URL}${resultsUrl}`);
+        if (!res.ok) throw new Error('Failed to fetch results');
+
+        const data = await res.json();
+        if (data.status !== 'ok') {
+            throw new Error(data.error || 'Results not ready');
+        }
+
+        renderResults(data.items);
+        setStatus('ok', `${data.count} results`);
+        showToast(`Scrape complete: ${data.count} results`, 'success');
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // RESULTS RENDERING
+    // ──────────────────────────────────────────────────────────────────
+    function renderResults(items) {
+        if (!items || items.length === 0) {
+            tableContainer.innerHTML = '<div class="empty-state">No results found. Try different parameters.</div>';
+            return;
+        }
+
+        // Collect all unique keys (excluding internal ones)
+        const excludeKeys = new Set(['input', 'inputUrl', 'fromProfileSection', 'searchSource']);
+        const keys = [...new Set(items.flatMap(Object.keys))].filter(k => !excludeKeys.has(k));
+
+        const table = document.createElement('table');
+        const thead = document.createElement('thead');
+        const tbody = document.createElement('tbody');
+
+        // Header
+        const headerRow = document.createElement('tr');
+        for (const key of keys) {
+            const th = document.createElement('th');
+            th.textContent = key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase()).trim();
+            headerRow.appendChild(th);
+        }
+        thead.appendChild(headerRow);
+
+        // Rows
+        for (const item of items) {
+            const tr = document.createElement('tr');
+            for (const key of keys) {
+                const td = document.createElement('td');
+                let val = item[key];
+                if (val && typeof val === 'object') {
+                    val = JSON.stringify(val).slice(0, 80);
+                }
+                td.textContent = val != null ? String(val) : '—';
+                td.title = val != null ? String(val) : '—';
+                tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+        }
+
+        table.appendChild(thead);
+        table.appendChild(tbody);
+        tableContainer.innerHTML = '';
+        tableContainer.appendChild(table);
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // UTILITIES
+    // ──────────────────────────────────────────────────────────────────
+    function setStatus(type, text) {
+        statusDot.className = 'status-dot ' + type;
+        statusText.textContent = text;
+    }
+
+    function showToast(msg, type = 'success') {
+        toast.textContent = msg;
+        toast.className = 'toast ' + type;
+        // Force reflow
+        void toast.offsetWidth;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 4000);
+    }
+
+    // ──────────────────────────────────────────────────────────────────
+    // EVENT LISTENERS
+    // ──────────────────────────────────────────────────────────────────
+    runBtn.addEventListener('click', runScrape);
+    cancelBtn.addEventListener('click', () => {
+        configPanel.style.display = 'none';
+        document.querySelectorAll('.platform-card').forEach(c => c.classList.remove('active'));
+        state.selectedPlatform = null;
+        state.selectedMode = null;
+    });
+
+    // ──────────────────────────────────────────────────────────────────
+    // INIT
+    // ──────────────────────────────────────────────────────────────────
+    async function init() {
+        renderPlatforms();
+        await initWhop();
+        setStatus('', 'Idle');
+    }
+
+    init();
+</script>
+</body>
+</html>
